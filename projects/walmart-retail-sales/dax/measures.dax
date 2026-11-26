@@ -1,0 +1,96 @@
+-- Create each expression as a separate measure.
+-- Source table and column names match the provided WalmartSalesData.csv.csv.
+
+Total Sales =
+SUM ( Sales[Total] )
+
+Transaction Count =
+DISTINCTCOUNT ( Sales[Invoice ID] )
+
+Units Sold =
+SUM ( Sales[Quantity] )
+
+Cost of Goods Sold =
+SUM ( Sales[cogs] )
+
+Gross Income =
+SUM ( Sales[gross income] )
+
+Tax Amount =
+SUM ( Sales[Tax 5%] )
+
+Average Transaction Value =
+DIVIDE ( [Total Sales], [Transaction Count] )
+
+Average Rating =
+AVERAGE ( Sales[Rating] )
+
+Gross Income Margin % =
+DIVIDE ( [Gross Income], [Total Sales] )
+
+Gross Income per Transaction =
+DIVIDE ( [Gross Income], [Transaction Count] )
+
+Member Transactions =
+CALCULATE (
+    [Transaction Count],
+    KEEPFILTERS ( Sales[Customer type] = "Member" )
+)
+
+Normal Transactions =
+CALCULATE (
+    [Transaction Count],
+    KEEPFILTERS ( Sales[Customer type] = "Normal" )
+)
+
+Member Sales =
+CALCULATE (
+    [Total Sales],
+    KEEPFILTERS ( Sales[Customer type] = "Member" )
+)
+
+Normal Sales =
+CALCULATE (
+    [Total Sales],
+    KEEPFILTERS ( Sales[Customer type] = "Normal" )
+)
+
+Sales Share by Product Line % =
+DIVIDE (
+    [Total Sales],
+    CALCULATE (
+        [Total Sales],
+        REMOVEFILTERS ( Sales[Product line] )
+    )
+)
+
+Gross Income Share by Product Line % =
+DIVIDE (
+    [Gross Income],
+    CALCULATE (
+        [Gross Income],
+        REMOVEFILTERS ( Sales[Product line] )
+    )
+)
+
+Previous Month Sales =
+CALCULATE (
+    [Total Sales],
+    DATEADD ( 'Calendar'[Date], -1, MONTH )
+)
+
+Month-over-Month Sales Change =
+[Total Sales] - [Previous Month Sales]
+
+Month-over-Month Sales Change % =
+DIVIDE (
+    [Month-over-Month Sales Change],
+    [Previous Month Sales]
+)
+
+-- Suggested formatting:
+-- Total Sales, COGS, Gross Income, Tax Amount: decimal, 2 places.
+-- Average Transaction Value, Gross Income per Transaction: decimal, 2 places.
+-- Gross Income Margin %, product-line shares, and MoM change %: percentage.
+-- Average Rating: decimal, 2 places.
+-- Confirm the source currency before adding a currency symbol.
