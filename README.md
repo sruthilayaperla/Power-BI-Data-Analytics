@@ -11,7 +11,7 @@ A hands-on **Power BI, DAX, Power Query, and business intelligence portfolio** f
 
 [Open the implementation pack](projects/walmart-retail-sales/)
 
-This project adds a reusable Power BI build pack for the historical 1,000-transaction retail sample dataset: a Calendar dimension, 20+ explicit DAX measures, a Power Query transformation, a report theme, a four-page dashboard blueprint, and KPI reconciliation checks.
+This project adds a reusable Power BI build pack for the historical 1,000-transaction retail sample dataset: a Calendar dimension, 20 explicit DAX measures, a Power Query transformation, a report theme, a four-page dashboard blueprint, and KPI reconciliation checks.
 
 **Build status:** The source assets and report instructions are in the repository; the finished `.pbix` file and report screenshots still need to be saved from Power BI Desktop. The linked Python/SQL companion project validates the source totals with GitHub Actions.
 
