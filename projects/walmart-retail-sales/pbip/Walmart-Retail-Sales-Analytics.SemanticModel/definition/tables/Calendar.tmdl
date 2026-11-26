@@ -1,0 +1,46 @@
+/// Continuous date dimension for time-based analysis.
+table 'Calendar'
+	column Date
+		dataType: dateTime
+		dataCategory: Time
+		isKey
+		summarizeBy: none
+
+	column Year = YEAR([Date])
+		dataType: int64
+		summarizeBy: none
+
+	column 'Quarter' = "Q" & FORMAT([Date], "Q")
+		dataType: string
+		summarizeBy: none
+
+	column 'Month Number' = MONTH([Date])
+		dataType: int64
+		summarizeBy: none
+
+	column 'Month Name' = FORMAT([Date], "MMMM")
+		dataType: string
+		sortByColumn: 'Month Number'
+		summarizeBy: none
+
+	column 'Year Month' = FORMAT([Date], "YYYY-MM")
+		dataType: string
+		sortByColumn: 'Year Month Sort'
+		summarizeBy: none
+
+	column 'Year Month Sort' = YEAR([Date]) * 100 + MONTH([Date])
+		dataType: int64
+		summarizeBy: none
+
+	column 'Day Number' = WEEKDAY([Date], 2)
+		dataType: int64
+		summarizeBy: none
+
+	column 'Day Name' = FORMAT([Date], "dddd")
+		dataType: string
+		sortByColumn: 'Day Number'
+		summarizeBy: none
+
+	partition Calendar = calculated
+		mode: import
+		source = CALENDAR(MIN(Sales[Date]), MAX(Sales[Date]))
