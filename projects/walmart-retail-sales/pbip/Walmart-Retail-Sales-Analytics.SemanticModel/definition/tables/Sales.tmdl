@@ -1,0 +1,194 @@
+/// Retail transaction fact table. One source row represents one invoice.
+table Sales
+	column 'Invoice ID'
+		dataType: string
+		sourceColumn: Invoice ID
+		summarizeBy: none
+
+	column Branch
+		dataType: string
+		sourceColumn: Branch
+		summarizeBy: none
+
+	column City
+		dataType: string
+		sourceColumn: City
+		summarizeBy: none
+
+	column 'Customer type'
+		dataType: string
+		sourceColumn: Customer type
+		summarizeBy: none
+
+	column Gender
+		dataType: string
+		sourceColumn: Gender
+		summarizeBy: none
+
+	column 'Product line'
+		dataType: string
+		sourceColumn: Product line
+		summarizeBy: none
+
+	column 'Unit price'
+		dataType: double
+		sourceColumn: Unit price
+		summarizeBy: sum
+
+	column Quantity
+		dataType: int64
+		sourceColumn: Quantity
+		summarizeBy: sum
+
+	column 'Tax 5%'
+		dataType: double
+		sourceColumn: Tax 5%
+		summarizeBy: sum
+
+	column Total
+		dataType: double
+		sourceColumn: Total
+		summarizeBy: sum
+
+	column Date
+		dataType: dateTime
+		sourceColumn: Date
+		summarizeBy: none
+
+	column Time
+		dataType: dateTime
+		sourceColumn: Time
+		summarizeBy: none
+
+	column Payment
+		dataType: string
+		sourceColumn: Payment
+		summarizeBy: none
+
+	column cogs
+		dataType: double
+		sourceColumn: cogs
+		summarizeBy: sum
+
+	column 'gross margin percentage'
+		dataType: double
+		sourceColumn: gross margin percentage
+		summarizeBy: none
+
+	column 'gross income'
+		dataType: double
+		sourceColumn: gross income
+		summarizeBy: sum
+
+	column Rating
+		dataType: double
+		sourceColumn: Rating
+		summarizeBy: average
+
+	measure 'Total Sales' = SUM(Sales[Total])
+		formatString: #,##0.00
+
+	measure 'Transaction Count' = DISTINCTCOUNT(Sales[Invoice ID])
+		formatString: #,##0
+
+	measure 'Units Sold' = SUM(Sales[Quantity])
+		formatString: #,##0
+
+	measure 'Cost of Goods Sold' = SUM(Sales[cogs])
+		formatString: #,##0.00
+
+	measure 'Gross Income' = SUM(Sales[gross income])
+		formatString: #,##0.00
+
+	measure 'Tax Amount' = SUM(Sales[Tax 5%])
+		formatString: #,##0.00
+
+	measure 'Average Transaction Value' = DIVIDE([Total Sales],[Transaction Count])
+		formatString: #,##0.00
+
+	measure 'Average Units per Transaction' = DIVIDE([Units Sold],[Transaction Count])
+		formatString: #,##0.00
+
+	measure 'Average Rating' = AVERAGE(Sales[Rating])
+		formatString: 0.00
+
+	measure 'Gross Income Margin %' = DIVIDE([Gross Income],[Total Sales])
+		formatString: 0.00%
+
+	measure 'Gross Income per Transaction' = DIVIDE([Gross Income],[Transaction Count])
+		formatString: #,##0.00
+
+	measure 'Member Transactions' = CALCULATE([Transaction Count], KEEPFILTERS(Sales[Customer type] = "Member"))
+		formatString: #,##0
+
+	measure 'Normal Transactions' = CALCULATE([Transaction Count], KEEPFILTERS(Sales[Customer type] = "Normal"))
+		formatString: #,##0
+
+	measure 'Member Sales' = CALCULATE([Total Sales], KEEPFILTERS(Sales[Customer type] = "Member"))
+		formatString: #,##0.00
+
+	measure 'Normal Sales' = CALCULATE([Total Sales], KEEPFILTERS(Sales[Customer type] = "Normal"))
+		formatString: #,##0.00
+
+	measure 'Sales Share by Product Line %' = DIVIDE([Total Sales], CALCULATE([Total Sales], REMOVEFILTERS(Sales[Product line])))
+		formatString: 0.00%
+
+	measure 'Gross Income Share by Product Line %' = DIVIDE([Gross Income], CALCULATE([Gross Income], REMOVEFILTERS(Sales[Product line])))
+		formatString: 0.00%
+
+	measure 'Previous Month Sales' = CALCULATE([Total Sales], DATEADD('Calendar'[Date], -1, MONTH))
+		formatString: #,##0.00
+
+	measure 'Month-over-Month Sales Change' = [Total Sales] - [Previous Month Sales]
+		formatString: #,##0.00
+
+	measure 'Month-over-Month Sales Change %' = DIVIDE([Month-over-Month Sales Change], [Previous Month Sales])
+		formatString: 0.00%
+
+	partition Sales = m
+		mode: import
+		source = ```
+			let
+			    Source = Csv.Document(
+			        File.Contents(pCsvPath),
+			        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+			    ),
+			    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    ChangedTypes = Table.TransformColumnTypes(
+			        PromotedHeaders,
+			        {
+			            {"Invoice ID", type text},
+			            {"Branch", type text},
+			            {"City", type text},
+			            {"Customer type", type text},
+			            {"Gender", type text},
+			            {"Product line", type text},
+			            {"Unit price", type number},
+			            {"Quantity", Int64.Type},
+			            {"Tax 5%", type number},
+			            {"Total", type number},
+			            {"Date", type date},
+			            {"Time", type time},
+			            {"Payment", type text},
+			            {"cogs", type number},
+			            {"gross margin percentage", type number},
+			            {"gross income", type number},
+			            {"Rating", type number}
+		        },
+		        "en-US"
+		    ),
+		    TrimText = Table.TransformColumns(
+		        ChangedTypes,
+		        {
+		            {"Invoice ID", Text.Trim, type text},
+		            {"Branch", Text.Trim, type text},
+		            {"City", Text.Trim, type text},
+		            {"Customer type", Text.Trim, type text},
+		            {"Gender", Text.Trim, type text},
+		            {"Product line", Text.Trim, type text},
+		            {"Payment", Text.Trim, type text}
+		        }
+		    )
+		in
+		    TrimText
+		```
