@@ -22,6 +22,9 @@ SUM ( Sales[Tax 5%] )
 Average Transaction Value =
 DIVIDE ( [Total Sales], [Transaction Count] )
 
+Average Units per Transaction =
+DIVIDE ( [Units Sold], [Transaction Count] )
+
 Average Rating =
 AVERAGE ( Sales[Rating] )
 
