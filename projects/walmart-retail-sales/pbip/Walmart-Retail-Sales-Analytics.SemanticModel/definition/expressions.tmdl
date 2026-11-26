@@ -1,0 +1,2 @@
+/// Local path to the downloaded Walmart sample CSV. Change this in Power Query before refresh.
+expression pCsvPath = "C:\\Data\\WalmartSalesData.csv.csv" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
