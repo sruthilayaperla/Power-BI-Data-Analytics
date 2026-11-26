@@ -1,0 +1,61 @@
+name: Power BI portfolio asset checks
+
+on:
+  push:
+    paths:
+      - "projects/walmart-retail-sales/**"
+      - ".github/workflows/portfolio-assets.yml"
+  pull_request:
+    paths:
+      - "projects/walmart-retail-sales/**"
+      - ".github/workflows/portfolio-assets.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate required project files and theme JSON
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("projects/walmart-retail-sales")
+          required = [
+              root / "README.md",
+              root / "dax" / "calendar_table.dax",
+              root / "dax" / "measures.dax",
+              root / "power-query" / "transform_sales.m",
+              root / "theme" / "powerbi-theme.json",
+              root / "docs" / "report-blueprint.md",
+          ]
+
+          missing = [str(path) for path in required if not path.is_file()]
+          if missing:
+              raise SystemExit("Missing required project files: " + ", ".join(missing))
+
+          theme_path = root / "theme" / "powerbi-theme.json"
+          with theme_path.open(encoding="utf-8") as handle:
+              theme = json.load(handle)
+
+          if not theme.get("name") or not theme.get("dataColors"):
+              raise SystemExit("Theme JSON must include a name and dataColors array.")
+
+          empty_files = [str(path) for path in required if path.stat().st_size == 0]
+          if empty_files:
+              raise SystemExit("Empty project files: " + ", ".join(empty_files))
+
+          print("Power BI project files exist and the theme JSON is valid.")
+          PY
