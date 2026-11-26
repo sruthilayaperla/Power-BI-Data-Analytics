@@ -1,0 +1,16 @@
+{
+  "name": "Retail Analytics Portfolio",
+  "dataColors": [
+    "#1F4E79",
+    "#00A6A6",
+    "#F2B134",
+    "#6C7A89",
+    "#D95D39",
+    "#7A6FF0",
+    "#4C956C",
+    "#C06C84"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#243447",
+  "tableAccent": "#1F4E79"
+}
