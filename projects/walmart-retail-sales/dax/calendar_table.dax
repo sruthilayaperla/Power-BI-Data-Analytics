@@ -1,0 +1,24 @@
+-- Create this calculated table in Power BI: Modeling > New table.
+-- Create a one-to-many relationship:
+-- Calendar[Date] (one) -> Sales[Date] (many).
+
+Calendar =
+ADDCOLUMNS (
+    CALENDAR (
+        MINX ( ALL ( Sales ), Sales[Date] ),
+        MAXX ( ALL ( Sales ), Sales[Date] )
+    ),
+    "Year", YEAR ( [Date] ),
+    "Quarter", "Q" & FORMAT ( [Date], "Q" ),
+    "Month Number", MONTH ( [Date] ),
+    "Month Name", FORMAT ( [Date], "MMMM" ),
+    "Year Month", FORMAT ( [Date], "YYYY-MM" ),
+    "Year Month Sort", YEAR ( [Date] ) * 100 + MONTH ( [Date] ),
+    "Day Number", WEEKDAY ( [Date], 2 ),
+    "Day Name", FORMAT ( [Date], "dddd" )
+)
+
+-- After creating the table:
+-- 1. Select Calendar[Year Month] > Sort by column > Year Month Sort.
+-- 2. Select Calendar[Month Name] > Sort by column > Month Number.
+-- 3. Mark Calendar as the model's date table using Calendar[Date].
