@@ -1,0 +1,10 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.0.0/schema.json",
+  "pageOrder": [
+    "Executive_Overview",
+    "Product_Performance",
+    "Customer_Payment",
+    "Time_Analysis"
+  ],
+  "activePageName": "Executive_Overview"
+}
